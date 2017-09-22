@@ -18,14 +18,35 @@ describe Aliexpress do
     )
   end
 
-  it 'get success payment' do
-    requests = aliexpress.orders.complited(
-      startDate: '2017-07-01',
-      endDate: '2017-09-27',
-      liveOrderStatus: 'success'
-    )
+  describe 'API getCompletedOrders' do
+    it 'bad request 20030000 required parameter' do
+      expect {
+        result = aliexpress.orders.complited(
+          startDate: '2017-07-01',
+          endDate: '2017-09-27'
+        )
+      }.to raise_error(Aliexpress::Errors::BadRequest, /20030000/)
+    end
 
-    puts "========#{requests}="
+    it 'get success: completed order' do
+      result = aliexpress.orders.complited(
+        startDate: '2017-07-01',
+        endDate: '2017-09-27',
+        liveOrderStatus: 'success'
+      )
+
+      expect(result['orders'].count).to be > 0
+    end
+
+    it 'get pay：payment success' do
+      result = aliexpress.orders.complited(
+        startDate: '2017-07-01',
+        endDate: '2017-09-27',
+        liveOrderStatus: 'pay'
+      )
+
+      expect(result['orders'].count).to eq(0)
+    end
   end
 
   it 'getItemByOrderNumbers' do

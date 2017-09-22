@@ -1,8 +1,7 @@
 module Aliexpress
   module Requests
     module InstanceModule
-      mattr_accessor :config
-      mattr_accessor :request_url
+      mattr_accessor :config, :request_url, :endpoint
       mattr_accessor :api_signature do true end
 
       def request(params)
@@ -12,13 +11,14 @@ module Aliexpress
       end
 
       def response(params)
-        Aliexpress::Response.parse_request do
+        Aliexpress::Response.parse_request endpoint do
           request(params)
         end
       end
 
       def api_endpoint(request_path)
         self.request_url = [config[:api_url], request_path, '/', config[:api_key]].join('')
+        self.endpoint = request_path
 
         self
       end

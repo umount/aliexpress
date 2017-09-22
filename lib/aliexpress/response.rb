@@ -1,15 +1,15 @@
 module Aliexpress
   module Response
     module ClassMethods
-      def parse_request(&request)
+      def parse_request(api_endpoint)
         begin
-          response = request.call
+          response = yield
         rescue => error
           Aliexpress::Errors::Internal.new(error)
         end
 
         if response.code == 200
-          fetch_data(response)
+          fetch_data(api_endpoint, response)
         else
           raise Aliexpress::Errors::ExternalServiceUnavailable.new(
             "#{response.code} / #{response.body}"
@@ -17,26 +17,26 @@ module Aliexpress
         end
       end
 
-      def fetch_data(response)
+      def fetch_data(api_endpoint, response)
         _response = JSON.parse(response.body)
         error_code = _response['errorCode'].to_i
 
         if error_code == 20010000
           _response['result']
         else
-          error_message = "#{error_code} / #{get_error(error_code)}"
+          error_message = "#{error_code} / #{get_error(api_endpoint, error_code)}"
 
-          case error_code
-          when 20030000
-            raise Aliexpress::Errors::UnauthorizedAccess.new(error_message)
-          else
-            raise Aliexpress::Errors::BadRequest.new(error_message)
-          end
+          #case error_code
+          #when 20030000
+          #  raise Aliexpress::Errors::UnauthorizedAccess.new(error_message)
+          #else
+          #end
+          raise Aliexpress::Errors::BadRequest.new(error_message)
         end
       end
 
-      def get_error(code)
-        Aliexpress::Errors::CodeDescription.get(code)
+      def get_error(api_endpoint, code)
+        Aliexpress::Errors::CodeDescription.get(api_endpoint, code)
       end
     end
 

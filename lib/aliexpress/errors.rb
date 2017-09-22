@@ -21,9 +21,8 @@ module Aliexpress
     class ExternalServiceUnavailable < CustomError; self.code = 503 end
 
     module CodeDescription
-      def get(code)
-        code_list = {
-          0        => 'Error tag empty',
+      def get(endpoint, code)
+        @listPromotionProduct = {
           20010000 => 'Call succeeds',
           20020000 => 'System Error',
           20030000 => 'Unauthorized transfer request',
@@ -46,7 +45,17 @@ module Aliexpress
           20030170 => 'Credit Score input parameter error'
         }
 
-        code_list[code]
+        @getCompletedOrders = {
+          20010000 => 'Call succeeds',
+          20020000 => 'System Error',
+          20030000 => 'Required Parameter error',
+          20030070 => 'Unauthorized transfer request',
+          20030140 => 'Page number input parameter error',
+          20030150 => 'Page size input parameter error'
+        }
+
+        error_list = instance_variable_get("@#{endpoint}")
+        error_list ? error_list[code] : code
       end
 
       extend self
