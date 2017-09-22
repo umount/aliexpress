@@ -4,7 +4,7 @@ describe Aliexpress do
   let(:aliexpress) {
     Aliexpress.new(
       api_key: Settings.aliexpress.api_key,
-      api_signature: Settings.aliexpress.api_signature,
+      api_secret: Settings.aliexpress.api_secret,
       tracking_link: 'http://s.click.aliexpress.com/e/NvFqR3f'
     )
   }
@@ -18,17 +18,30 @@ describe Aliexpress do
     )
   end
 
+  it 'get success payment' do
+    requests = aliexpress.orders.complited(
+      startDate: '2017-07-01',
+      endDate: '2017-09-27',
+      liveOrderStatus: 'success'
+    )
+
+    puts "========#{requests}="
+  end
+
+  it 'getItemByOrderNumbers' do
+    requests = aliexpress.orders.get_by_number(
+      orderNumbers: '84842060660980'
+    )
+
+    puts "=========#{requests}="
+  end
+
   it 'autoload requests class' do
     requests = aliexpress.list_promotion_creative(
       category: 'all', language: 'en'
     )
   end
 
-  it 'getItemByOrderNumbers' do
-    requests = aliexpress.get_item_by_order_numbers(
-      orderNumbers: '84842060660980'
-    )
-  end
 
   it 'getOrderStatus' do
     requests = aliexpress.get_order_status(
@@ -36,11 +49,4 @@ describe Aliexpress do
     )
   end
 
-  it 'getCompletedOrders' do
-    requests = aliexpress.get_completed_orders(
-      startDate: '2017-01-01',
-      endDate: '2017-07-27',
-      liveOrderStatus: 'pay'
-    )
-  end
 end

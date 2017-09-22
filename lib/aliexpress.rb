@@ -2,6 +2,8 @@ require 'rest-client'
 require 'json'
 
 require 'aliexpress/version'
+require 'aliexpress/errors'
+require 'aliexpress/response'
 require 'aliexpress/requests'
 
 Dir[
@@ -22,7 +24,7 @@ module Aliexpress
       @config = {
         api_url: 'https://gw.api.alibaba.com/openapi/param2/2/portals.open/api.',
         api_key: false,
-        api_signature: false
+        api_secret: false
       }.merge!(config)
     end
   end

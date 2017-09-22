@@ -1,24 +1,26 @@
 module Aliexpress
   module Requests
-    module Utils
-      def request(config, params)
-        params.merge!({appSignature: config[:api_signature]}) if api_signature?
+    module InstanceModule
+      mattr_accessor :config
+      mattr_accessor :request_url
+      mattr_accessor :api_signature do true end
 
-        RestClient.get(api_endpoint(config), { params: params })
+      def request(params)
+        params.merge!({appSignature: config[:api_secret]}) if api_signature
+
+        RestClient.get(request_url, { params: params })
       end
 
-      def api_endpoint(config, signature=false)
-        module_name = self.name.split('::').last
-        request_path = module_name[0, 1].downcase + module_name[1..-1]
-        endpoint = [config[:api_url], request_path, '/', config[:api_key]].join('')
+      def response(params)
+        Aliexpress::Response.parse_request do
+          request(params)
+        end
       end
 
-      def api_signature(required=false)
-        @api_signature = required
-      end
+      def api_endpoint(request_path)
+        self.request_url = [config[:api_url], request_path, '/', config[:api_key]].join('')
 
-      def api_signature?
-        @api_signature
+        self
       end
     end
 
@@ -32,17 +34,17 @@ module Aliexpress
       end
 
       def method_missing(method_name, *args, &block)
-        class_path = method_name.to_s.split(/\_/).map(&:capitalize).join('')
+        class_path = method_name.capitalize
         class_name = "Aliexpress::Requests::#{class_path}"
 
         if Object.const_defined?(class_name)
-          _instanse = Object.const_get(class_name)
-          _instanse.request(@config, *args)
+          _instanse = Object.const_get(class_name).new
+          _instanse.config = @config
+          _instanse
         else
           super
         end
       end
-
     end
   end
 end
