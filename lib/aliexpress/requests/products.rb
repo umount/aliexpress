@@ -1,12 +1,20 @@
 module Aliexpress
   module Requests
-    module Products
+    class Products
       include Aliexpress::Requests::InstanceModule
 
-      def list_similar(params)
-        api_endpoint 'listSimilarProducts'
+      def list_promotion(params)
+        api_endpoint 'listPromotionProduct'
 
-        request(params)
+        self.api_signature = false
+
+        response(params)
+      end
+
+      def get_by_number(params)
+        api_endpoint 'getItemByOrderNumbers'
+
+        response(params)
       end
     end
   end

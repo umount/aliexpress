@@ -9,8 +9,8 @@ module Aliexpress
         response(params)
       end
 
-      def get_by_number(params)
-        api_endpoint 'getItemByOrderNumbers'
+      def get_status(params)
+        api_endpoint 'getOrderStatus'
 
         response(params)
       end

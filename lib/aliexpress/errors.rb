@@ -54,6 +54,23 @@ module Aliexpress
           20030150 => 'Page size input parameter error'
         }
 
+        @getItemByOrderNumbers = {
+          20010000 => 'Call succeeds',
+          20020000 => 'System Error',
+          20030070 => 'Unauthorized transfer request',
+          20030000 => 'Required parameters',
+          20030170 => 'Parameter input error'
+        }
+
+        @getOrderStatus = {
+          20010000 => 'Call succeeds',
+          20020000 => 'System Error',
+          20030000 => 'Required Parameter error',
+          20030070 => 'Unauthorized transfer request',
+          20030170 => 'Exceed max order numbers',
+          20030160 => 'Parameter input error'
+        }
+
         error_list = instance_variable_get("@#{endpoint}")
         error_list ? error_list[code] : code
       end

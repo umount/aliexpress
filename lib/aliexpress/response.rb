@@ -26,11 +26,6 @@ module Aliexpress
         else
           error_message = "#{error_code} / #{get_error(api_endpoint, error_code)}"
 
-          #case error_code
-          #when 20030000
-          #  raise Aliexpress::Errors::UnauthorizedAccess.new(error_message)
-          #else
-          #end
           raise Aliexpress::Errors::BadRequest.new(error_message)
         end
       end
