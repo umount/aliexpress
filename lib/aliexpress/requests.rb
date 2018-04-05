@@ -7,7 +7,11 @@ module Aliexpress
       def request(params)
         params.merge!({appSignature: config[:api_secret]}) if api_signature
 
-        RestClient.get(request_url, { params: params })
+        begin
+          RestClient.get(request_url, { params: params })
+        rescue RestClient::ExceptionWithResponse => e
+          e.response
+        end
       end
 
       def response(params)
