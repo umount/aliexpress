@@ -8,11 +8,17 @@ module Aliexpress
           Aliexpress::Errors::Internal.new(error)
         end
 
-        if response.code == 200
-          fetch_data(api_endpoint, response)
+        if response.is_a?(RestClient::Response)
+          if response.code == 200
+            fetch_data(api_endpoint, response)
+          else
+            raise Aliexpress::Errors::ExternalServiceUnavailable.new(
+              "#{response.code} / #{response.body}"
+            )
+          end
         else
           raise Aliexpress::Errors::ExternalServiceUnavailable.new(
-            "#{response.code} / #{response.body}"
+            "WTF? #{response.inspect}"
           )
         end
       end

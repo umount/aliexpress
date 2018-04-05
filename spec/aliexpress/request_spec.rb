@@ -20,6 +20,16 @@ describe Aliexpress do
 
   describe 'Orders API requests' do
     describe 'API getCompletedOrders' do
+      it 'invalid bad API key' do
+        aliexpress.configure[:api_key] = '-'
+
+        expect {
+          result = aliexpress.orders.complited(
+            startDate: '2017-07-01'
+          )
+        }.to raise_error(Aliexpress::Errors::ExternalServiceUnavailable, /Invalid appKey/)
+      end
+
       it 'bad request 20030000 required parameter' do
         expect {
           result = aliexpress.orders.complited(
