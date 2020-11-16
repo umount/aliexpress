@@ -1,14 +1,20 @@
 module Aliexpress
   module Requests
     module InstanceModule
-      mattr_accessor :config, :request_url, :endpoint
+      mattr_accessor :config, :method_params, :endpoint
       mattr_accessor :api_signature do true end
 
       def request(params)
-        params.merge!({appSignature: config[:api_secret]}) if api_signature
+        params.merge!(method_params)
+
+        sign_string = params.map{|h| h.to_a}.flatten(1).join('')
+        signature = Digest::MD5.hexdigest(
+          config[:api_secret] + sign_string + config[:api_secret]
+        )
+        params.merge!({sign: signature})
 
         begin
-          RestClient.get(request_url, { params: params })
+          RestClient.post(config[:api_url], params)
         rescue RestClient::ExceptionWithResponse => e
           e.response
         end
@@ -20,9 +26,11 @@ module Aliexpress
         end
       end
 
-      def api_endpoint(request_path)
-        self.request_url = [config[:api_url], request_path, '/', config[:api_key]].join('')
-        self.endpoint = request_path
+      def api_endpoint(request_method)
+        params = {format: 'json', v: '2.0', sign_method: 'hmac', app_key: config[:api_key]}
+
+        self.endpoint = config[:api_url]
+        self.method_params = params.merge!(method: request_method)
 
         self
       end

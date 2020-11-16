@@ -1,5 +1,6 @@
 require 'rest-client'
 require 'json'
+require 'digest'
 
 require 'aliexpress/version'
 require 'aliexpress/errors'
@@ -22,7 +23,7 @@ module Aliexpress
 
     def configure(config={})
       @config = {
-        api_url: 'https://gw.api.alibaba.com/openapi/param2/2/portals.open/api.',
+        api_url: 'http://api.taobao.com/router/rest',
         api_key: false,
         api_secret: false
       }.merge!(config)

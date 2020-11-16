@@ -8,6 +8,7 @@ module Aliexpress
           Aliexpress::Errors::Internal.new(error)
         end
 
+        pp response.body
         if response.is_a?(RestClient::Response)
           if response.code == 200
             fetch_data(api_endpoint, response)
@@ -25,14 +26,14 @@ module Aliexpress
 
       def fetch_data(api_endpoint, response)
         _response = JSON.parse(response.body)
-        error_code = _response['errorCode'].to_i
 
-        if error_code == 20010000
-          _response['result']
-        else
-          error_message = "#{error_code} / #{get_error(api_endpoint, error_code)}"
+        if _response.key?('error_response')
+          error = _response['error_response']
+          error_message = "#{error['code']} / #{error['msg']}"
 
           raise Aliexpress::Errors::BadRequest.new(error_message)
+        else
+          _response['result']
         end
       end
 

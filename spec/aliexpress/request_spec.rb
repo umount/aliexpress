@@ -25,16 +25,16 @@ describe Aliexpress do
 
         expect {
           result = aliexpress.orders.complited(
-            startDate: '2017-07-01'
+            start_time: '2017-07-01'
           )
-        }.to raise_error(Aliexpress::Errors::ExternalServiceUnavailable, /Invalid appKey/)
+        }.to raise_error(Aliexpress::Errors::BadRequest, /29 \/ Invalid app Key/)
       end
 
       it 'bad request 20030000 required parameter' do
         expect {
           result = aliexpress.orders.complited(
-            startDate: '2017-07-01',
-            endDate: '2017-09-27'
+            star_time: '2017-07-01',
+            end_time: '2017-09-27'
           )
         }.to raise_error(Aliexpress::Errors::BadRequest, /20030000/)
       end
@@ -51,11 +51,12 @@ describe Aliexpress do
 
       it 'get pay：payment success' do
         result = aliexpress.orders.complited(
-          startDate: '2017-07-01',
-          endDate: '2017-09-27',
+          startDate: '2019-08-05',
+          endDate: '2019-08-06',
           liveOrderStatus: 'pay'
         )
 
+        puts result
         expect(result['orders'].count).to eq(0)
       end
     end
@@ -70,9 +71,10 @@ describe Aliexpress do
 
       it 'success one request' do
         result = aliexpress.orders.get_status(
-          orderNumbers: '84842060660980'
+          orderNumbers: '8000045804775842'
         )
 
+        puts result
         expect(result['orders'].count).to eq(1)
       end
 
@@ -81,6 +83,7 @@ describe Aliexpress do
           orderNumbers: '84842060660980,84842060660981'
         )
 
+        puts result
         expect(result['orders'].count).to eq(2)
       end
     end
@@ -90,9 +93,10 @@ describe Aliexpress do
     describe 'API getItemByOrderNumbers' do
       it 'one order params' do
         result = aliexpress.products.get_by_number(
-          orderNumbers: '84842060660980'
+          orderNumbers: '8000045804775842'
         )
 
+        puts result
         expect(result['products'].count).to eq(1)
       end
 

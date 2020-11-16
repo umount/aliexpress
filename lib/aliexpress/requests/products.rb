@@ -4,7 +4,7 @@ module Aliexpress
       include Aliexpress::Requests::InstanceModule
 
       def list_promotion(params)
-        api_endpoint 'listPromotionProduct'
+        api_endpoint 'aliexpress.affiliate.product.query'
 
         self.api_signature = false
 
