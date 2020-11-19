@@ -40,8 +40,8 @@ describe Aliexpress do
 
       it 'get success: completed order' do
         result = aliexpress.orders.complited(
-          start_time: (Time.now - (3600 * 48)).strftime('%Y-%m-%d %H:%M:%S'),
-          end_time: (Time.now - (3600 * 24)).strftime('%Y-%m-%d %H:%M:%S')
+          start_time: (Time.now - (3600 * 24)).strftime('%Y-%m-%d %H:%M:%S'),
+          end_time: (Time.now + (3600 * 24)).strftime('%Y-%m-%d %H:%M:%S'),
         )
 
         expect(result['resp_code']).to eq(200)
@@ -78,7 +78,7 @@ describe Aliexpress do
 
       it 'success one request' do
         result = aliexpress.orders.get_status(
-          order_ids: '8000045804775842'
+          order_ids: '8121534304466797'
         )
 
         expect(result['resp_code']).to eq(200)
