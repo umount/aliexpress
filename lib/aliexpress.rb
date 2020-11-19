@@ -1,5 +1,6 @@
 require 'rest-client'
 require 'json'
+require 'active_support/core_ext/module/attribute_accessors'
 
 require 'aliexpress/version'
 require 'aliexpress/errors'
