@@ -1,6 +1,5 @@
 require 'rest-client'
 require 'json'
-require 'digest'
 
 require 'aliexpress/version'
 require 'aliexpress/errors'

@@ -30,99 +30,80 @@ describe Aliexpress do
         }.to raise_error(Aliexpress::Errors::BadRequest, /29 \/ Invalid app Key/)
       end
 
-      it 'bad request 20030000 required parameter' do
+      it 'bad request 40 required parameter' do
         expect {
           result = aliexpress.orders.complited(
-            star_time: '2017-07-01',
-            end_time: '2017-09-27'
+            start_time: (Time.now - (3600 * 48)).strftime('%Y-%m-%d %H:%M:%S'),
           )
-        }.to raise_error(Aliexpress::Errors::BadRequest, /20030000/)
+        }.to raise_error(Aliexpress::Errors::BadRequest, /40 \/ Missing required arguments:end_time/)
       end
 
       it 'get success: completed order' do
         result = aliexpress.orders.complited(
-          startDate: '2017-07-01',
-          endDate: '2017-09-27',
-          liveOrderStatus: 'success'
+          start_time: (Time.now - (3600 * 48)).strftime('%Y-%m-%d %H:%M:%S'),
+          end_time: (Time.now - (3600 * 24)).strftime('%Y-%m-%d %H:%M:%S')
         )
 
-        expect(result['orders'].count).to be > 0
+        expect(result['resp_code']).to eq(200)
+        expect(result['result']['current_record_count']).to be > 0
       end
 
-      it 'get pay：payment success' do
-        result = aliexpress.orders.complited(
-          startDate: '2019-08-05',
-          endDate: '2019-08-06',
-          liveOrderStatus: 'pay'
+      it 'get success：confirmed success' do
+        result = aliexpress.orders.confirmed(
+          start_time: (Time.now - (3600 * 48)).strftime('%Y-%m-%d %H:%M:%S'),
+          end_time: (Time.now - (3600 * 24)).strftime('%Y-%m-%d %H:%M:%S')
         )
 
-        puts result
-        expect(result['orders'].count).to eq(0)
+        expect(result['resp_code']).to eq(200)
+        expect(result['result']['current_record_count']).to be > 0
       end
     end
 
 
     describe 'API getOrderStatus' do
-      it 'bad request 20030000 required parameter' do
-        expect {
-          result = aliexpress.orders.get_status({})
-        }.to raise_error(Aliexpress::Errors::BadRequest, /20030000/)
+      it 'bad request required parameter' do
+         result = aliexpress.orders.get_status({})
+         expect(result['resp_code']).to eq(406)
+         expect(result['resp_msg']).to eq('The value of input params  is empty :null')
+      end
+
+      it 'empty result' do
+        result = aliexpress.orders.get_status(
+          order_ids: '84842060660980'
+        )
+
+        expect(result['resp_code']).to eq(405)
+        expect(result['resp_msg']).to eq('The result is empty')
       end
 
       it 'success one request' do
         result = aliexpress.orders.get_status(
-          orderNumbers: '8000045804775842'
+          order_ids: '8000045804775842'
         )
 
-        puts result
-        expect(result['orders'].count).to eq(1)
+        expect(result['resp_code']).to eq(200)
+        expect(result['result']['current_record_count']).to eq(1)
       end
 
       it 'success several request' do
         result = aliexpress.orders.get_status(
-          orderNumbers: '84842060660980,84842060660981'
+          order_ids: '8121404327155217,8121410984130215'
         )
 
-        puts result
-        expect(result['orders'].count).to eq(2)
+        expect(result['resp_code']).to eq(200)
+        expect(result['result']['current_record_count']).to eq(2)
       end
     end
   end
 
   describe 'Products API requests' do
-    describe 'API getItemByOrderNumbers' do
-      it 'one order params' do
-        result = aliexpress.products.get_by_number(
-          orderNumbers: '8000045804775842'
-        )
-
-        puts result
-        expect(result['products'].count).to eq(1)
-      end
-
-      it 'bad request 20030000 required parameter' do
-        expect {
-          result = aliexpress.products.get_by_number({})
-        }.to raise_error(Aliexpress::Errors::BadRequest, /20030000/)
-      end
-    end
-
     describe 'API listPromotionProduct' do
-      it 'discount input parameter error' do
-        expect {
-          result = aliexpress.products.list_promotion(
-            category: 'all', language: 'en'
-          )
-        }.to raise_error(Aliexpress::Errors::BadRequest, /20030120/)
-      end
-
       it 'success keywords request' do
         result = aliexpress.products.list_promotion(
-          fields: 'productUrl,productTitle',
           keywords: 'phone'
         )
-
-        expect(result['products'].count).to eq(20)
+        expect(result['resp_code']).to eq(200)
+        expect(result['result']['current_record_count']).to eq(50)
       end
     end
   end

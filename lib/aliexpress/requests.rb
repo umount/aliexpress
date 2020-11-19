@@ -1,17 +1,17 @@
 module Aliexpress
   module Requests
     module InstanceModule
-      mattr_accessor :config, :method_params, :endpoint
+      mattr_accessor :config, :method_params, :request_method
       mattr_accessor :api_signature do true end
 
       def request(params)
         params.merge!(method_params)
+        params = params.sort.to_h
 
         sign_string = params.map{|h| h.to_a}.flatten(1).join('')
-        signature = Digest::MD5.hexdigest(
-          config[:api_secret] + sign_string + config[:api_secret]
-        )
-        params.merge!({sign: signature})
+        signature = OpenSSL::HMAC.hexdigest("MD5", config[:api_secret], sign_string)
+
+        params.merge!({sign: signature.upcase})
 
         begin
           RestClient.post(config[:api_url], params)
@@ -21,15 +21,18 @@ module Aliexpress
       end
 
       def response(params)
-        Aliexpress::Response.parse_request endpoint do
+        Aliexpress::Response.parse_request request_method do
           request(params)
         end
       end
 
       def api_endpoint(request_method)
-        params = {format: 'json', v: '2.0', sign_method: 'hmac', app_key: config[:api_key]}
+        params = {
+          format: 'json', v: '2.0', sign_method: 'hmac', app_key: config[:api_key],
+          timestamp: Time.now.strftime('%Y-%m-%d %H:%M:%S')
+        }
 
-        self.endpoint = config[:api_url]
+        self.request_method = request_method
         self.method_params = params.merge!(method: request_method)
 
         self

@@ -5,6 +5,14 @@ module Aliexpress
 
       def complited(params)
         api_endpoint 'aliexpress.affiliate.order.list'
+        params = {status: 'Payment Completed'}.merge(params)
+
+        response(params)
+      end
+
+      def confirmed(params)
+        api_endpoint 'aliexpress.affiliate.order.list'
+        params = {status: 'Buyer Confirmed Receipt'}.merge(params)
 
         response(params)
       end

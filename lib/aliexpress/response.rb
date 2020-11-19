@@ -1,17 +1,16 @@
 module Aliexpress
   module Response
     module ClassMethods
-      def parse_request(api_endpoint)
+      def parse_request(request_method)
         begin
           response = yield
         rescue => error
           Aliexpress::Errors::Internal.new(error)
         end
 
-        pp response.body
         if response.is_a?(RestClient::Response)
           if response.code == 200
-            fetch_data(api_endpoint, response)
+            fetch_data(request_method, response)
           else
             raise Aliexpress::Errors::ExternalServiceUnavailable.new(
               "#{response.code} / #{response.body}"
@@ -24,7 +23,7 @@ module Aliexpress
         end
       end
 
-      def fetch_data(api_endpoint, response)
+      def fetch_data(request_method, response)
         _response = JSON.parse(response.body)
 
         if _response.key?('error_response')
@@ -33,12 +32,9 @@ module Aliexpress
 
           raise Aliexpress::Errors::BadRequest.new(error_message)
         else
-          _response['result']
+          response_name = request_method.gsub('.', '_') + '_response'
+          _response[response_name]['resp_result']
         end
-      end
-
-      def get_error(api_endpoint, code)
-        Aliexpress::Errors::CodeDescription.get(api_endpoint, code)
       end
     end
 
